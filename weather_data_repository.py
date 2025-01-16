@@ -148,6 +148,6 @@ class Repository:
     def current_weather(self):
         """Returns the last record in the database representing the most current weather."""
 
-        query = "SELECT * FROM weather ORDER BY Timestamp LIMIT 1"
+        query = "SELECT * FROM weather ORDER BY id DESC LIMIT 1"
 
         return self.execute_query(query, headers=True)
