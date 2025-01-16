@@ -45,11 +45,11 @@ class Repository:
 
                     print("Query executed successfully")
 
-                    return True
+                    return True, cursor.fetchall()
                 except Error as e:
                     print(f"The error '{e}' occurred")
 
-                    return False
+                    return False, None
 
     def create_weather_table(self):
         """Creates the weather table within the database if it does not already exist."""
@@ -138,3 +138,10 @@ class Repository:
                     print(f"The error '{e}' occurred")
 
                     return (False, None)
+                
+    def current_weather(self):
+        """Returns the last record in the database representing the most current weather."""
+
+        query = "SELECT * FROM weather ORDER BY Timestamp LIMIT 1"
+
+        return self.execute_query(query)
