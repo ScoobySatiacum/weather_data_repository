@@ -29,7 +29,7 @@ class Repository:
 
         return success
     
-    def execute_query(self, query, data=[]):
+    def execute_query(self, query, data=[], headers=False):
         """Executes a query against the database. Returns a boolean representing the success/failure of the queries execution."""
         with closing(sqlite3.connect(self._sql_db_path)) as connection:
             with closing(connection.cursor()) as cursor:
@@ -45,11 +45,17 @@ class Repository:
 
                     print("Query executed successfully")
 
-                    return True
+                    if headers:
+                        headers = list(map(lambda attr : attr[0], cursor.description))
+                        results = [{header:row[i] for i, header in enumerate(headers)} for row in cursor]
+                        return True, results
+                    else:
+                        return True, cursor.fetchall()
+
                 except Error as e:
                     print(f"The error '{e}' occurred")
 
-                    return False
+                    return False, None
 
     def create_weather_table(self):
         """Creates the weather table within the database if it does not already exist."""
@@ -138,3 +144,10 @@ class Repository:
                     print(f"The error '{e}' occurred")
 
                     return (False, None)
+                
+    def current_weather(self):
+        """Returns the last record in the database representing the most current weather."""
+
+        query = "SELECT * FROM weather ORDER BY id DESC LIMIT 1"
+
+        return self.execute_query(query, headers=True)
